@@ -1,0 +1,43 @@
+#pragma once
+#include "../core/game.hpp"
+#include "../core/state.hpp"
+
+namespace ttt::my_player {
+
+using game::IPlayer;
+using game::Point;
+using game::Sign;
+using game::State;
+
+class MyPlayer : public IPlayer {
+public:
+    MyPlayer(const char *name);
+    ~MyPlayer();
+
+    void set_sign(Sign sign) override;
+    Point make_move(const State &state) override;
+    const char *get_name() const override;
+
+private:
+    char m_name[32];
+    Sign m_sign;
+
+    // Динамический массив ходов
+    struct MoveArray {
+        Point* data;
+        int capacity;
+        int size;
+        MoveArray(int max_size);
+        ~MoveArray();
+        void clear();
+        void push_back(const Point& p);
+    };
+
+    bool is_within_bounds(int x, int y, const State &state) const;
+    bool has_neighbor(const State &state, int x, int y) const;
+    void generate_moves(const State &state, MoveArray &moves) const;
+    int evaluate(const State &state, Sign maximizer) const;
+    int minimax(State &state, int depth, int alpha, int beta, bool maximizing, Sign player, Point &best_move, long long deadline) const;
+};
+
+} // namespace ttt::my_player
